@@ -5,8 +5,8 @@ extern crate libc;
 
 use cocoa::base::{id, nil};
 
-static DELEGATE_NAME: &'static [u8] = b"interface_window_delegate\0";
-static DELEGATE_STATE_IVAR: &'static [u8] = b"interface_state";
+static DELEGATE_NAME: &'static [u8] = b"InterfaceDelegate";
+static DELEGATE_STATE_IVAR: &'static [u8] = b"interfaceDelegateState";
 
 #[derive(Show)]
 pub struct Error {
@@ -66,7 +66,8 @@ impl Window {
 
             let object = class("NSObject");
             let delegate = objc_allocateClassPair(object,
-                                                  DELEGATE_NAME.as_ptr() as *const _, 0);
+                                                  DELEGATE_NAME.as_ptr() as *const _,
+                                                  0);
 
             class_addMethod(delegate,
                             selector("windowShouldClose:"),
