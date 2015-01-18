@@ -6,3 +6,6 @@ license = "MIT"
 repository = "https://github.com/bodoni/interface"
 homepage = "https://github.com/bodoni/interface"
 description = "An interface."
+
+[dependencies.cocoa]
+git = "https://github.com/servo/rust-cocoa"
