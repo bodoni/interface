@@ -1,12 +1,11 @@
 use cocoa::base::id;
-use libc::c_void;
 
 use ::{Event, Window};
 
 const DELEGATE_NAME: &'static [u8] = b"Interlocutor\0";
 const DELEGATE_IVAR: &'static [u8] = b"data";
 
-pub unsafe fn new(window: id, data: *mut c_void) -> id {
+pub unsafe fn new(window: id, data: *mut Window) -> id {
     use cocoa::base::{class, msg_send, selector};
     use cocoa::base::{class_addMethod, class_addIvar};
     use cocoa::base::{objc_allocateClassPair, objc_registerClassPair};
@@ -44,7 +43,7 @@ pub unsafe fn new(window: id, data: *mut c_void) -> id {
 
     object_setInstanceVariable(delegate,
                                DELEGATE_IVAR.as_ptr() as *const _,
-                               data);
+                               data as *mut _);
 
     delegate
 }

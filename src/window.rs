@@ -33,7 +33,7 @@ impl Window {
 
             (*w).view = some!(create_view((*w).window), "cannot create a view");
             (*w).context = some!(create_context((*w).view), "cannot create a context");
-            (*w).delegate = ::delegate::new((*w).window, &mut *w as *mut _ as *mut _);
+            (*w).delegate = ::delegate::new((*w).window, &mut *w as *mut _);
         }
 
         Ok(w)
