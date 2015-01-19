@@ -14,6 +14,6 @@ mod support;
 mod error;
 mod result;
 
-mod event;
 mod delegate;
+mod event;
 mod window;

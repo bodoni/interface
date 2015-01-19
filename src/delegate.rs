@@ -2,7 +2,7 @@ use cocoa::base::id;
 
 use ::{Event, Window};
 
-const DELEGATE_NAME: &'static [u8] = b"Interlocutor\0";
+const DELEGATE_NAME: &'static [u8] = b"Delegate\0";
 const DELEGATE_IVAR: &'static [u8] = b"data";
 
 pub unsafe fn new(window: id, data: *mut Window) -> id {
