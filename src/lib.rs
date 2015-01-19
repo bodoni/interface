@@ -30,7 +30,7 @@ macro_rules! some(
     );
 );
 
-#[derive(Clone, Show, Copy)]
+#[derive(Clone, Copy, Show)]
 pub enum Event {
     LeftMouseDown,
 }
