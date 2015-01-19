@@ -7,7 +7,7 @@ script:
   - cargo build --verbose
 
 after_success:
-  - curl https://stainless-steel.github.io/travis/after_success.sh | bash
+  - curl https://bodoni.github.io/travis/after_success.sh | bash
 
 env:
   global:
