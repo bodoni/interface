@@ -130,9 +130,9 @@ impl Window {
                 false);
 
             NSApp().sendEvent_(event);
-        }
 
-        unsafe { self.poll() }
+            self.poll()
+        }
     }
 
     unsafe fn poll(&mut self) -> RingBuf<Event> {
