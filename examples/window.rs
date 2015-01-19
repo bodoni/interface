@@ -2,11 +2,15 @@
 
 extern crate interface;
 
-fn main() {
-    let mut window = interface::Window::new().unwrap();
+use interface::Window;
+use interface::Event::WindowClosed;
 
-    while !window.is_closed() {
-        window.react();
-        window.update();
+fn main() {
+    let mut window = Window::new().unwrap();
+    loop {
+        match window.react() {
+            Some(WindowClosed) => break,
+            _ => window.update(),
+        }
     }
 }

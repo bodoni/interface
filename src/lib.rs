@@ -4,7 +4,6 @@ extern crate cocoa;
 extern crate libc;
 
 use cocoa::base::{id, nil};
-use std::cell::Cell;
 use std::collections::RingBuf;
 
 static DELEGATE_NAME: &'static [u8] = b"Interlocutor\0";
@@ -33,6 +32,8 @@ macro_rules! some(
 #[derive(Clone, Copy, Show)]
 pub enum Event {
     LeftMouseDown,
+    WindowClosed,
+    WindowResized,
 }
 
 #[allow(dead_code, missing_copy_implementations)]
@@ -41,8 +42,7 @@ pub struct Window {
     view: id,
     context: id,
     delegate: id,
-
-    is_closed: Cell<bool>,
+    events: RingBuf<Event>,
 }
 
 impl Error {
@@ -106,8 +106,7 @@ impl Window {
                 view: view,
                 context: context,
                 delegate: delegate,
-
-                is_closed: Cell::new(false),
+                events: RingBuf::new(),
             });
 
             object_setInstanceVariable(delegate,
@@ -118,30 +117,30 @@ impl Window {
         }
     }
 
-    pub fn react(&mut self) -> RingBuf<Event> {
-        use cocoa::appkit::{NSApp, NSApplication, NSDate, NSDefaultRunLoopMode};
-        use cocoa::appkit::NSEventMask::NSAnyEventMask;
-
-        unsafe {
-            let event = NSApp().nextEventMatchingMask_untilDate_inMode_dequeue_(
-                NSAnyEventMask as u64,
-                NSDate::distantFuture(nil),
-                NSDefaultRunLoopMode,
-                false);
-
-            NSApp().sendEvent_(event);
-
-            self.poll()
-        }
+    pub fn react(&mut self) -> Option<Event> {
+        unsafe { self.poll() };
+        self.events.pop_front()
     }
 
-    unsafe fn poll(&mut self) -> RingBuf<Event> {
+    pub fn update(&self) {
+        use cocoa::appkit::NSOpenGLContext;
+
+        unsafe { self.context.flushBuffer() };
+    }
+
+    unsafe fn poll(&mut self) {
         use cocoa::appkit::{NSApp, NSApplication, NSDate, NSEvent};
         use cocoa::appkit::NSDefaultRunLoopMode;
         use cocoa::appkit::NSEventMask::NSAnyEventMask;
         use cocoa::appkit::NSEventType::NSLeftMouseDown;
 
-        let mut events = RingBuf::new();
+        let event = NSApp().nextEventMatchingMask_untilDate_inMode_dequeue_(
+            NSAnyEventMask as u64,
+            NSDate::distantFuture(nil),
+            NSDefaultRunLoopMode,
+            false);
+
+        NSApp().sendEvent_(event);
 
         loop {
             let event = NSApp().nextEventMatchingMask_untilDate_inMode_dequeue_(
@@ -157,23 +156,14 @@ impl Window {
             NSApp().sendEvent_(event);
 
             match event.get_type() {
-                NSLeftMouseDown => events.push_back(Event::LeftMouseDown),
+                NSLeftMouseDown => self.signal(Event::LeftMouseDown),
                 _ => {},
             }
         }
-        events
     }
 
-    pub fn is_closed(&self) -> bool {
-        self.is_closed.get()
-    }
-
-    pub fn update(&self) {
-        use cocoa::appkit::NSOpenGLContext;
-
-        unsafe {
-            self.context.flushBuffer();
-        }
+    fn signal(&mut self, event: Event) {
+        self.events.push_back(event);
     }
 }
 
@@ -277,26 +267,32 @@ unsafe fn create_context(view: id) -> Option<id> {
 }
 
 extern fn window_should_close(this: id, _: id) -> id {
-    use cocoa::base::object_getInstanceVariable;
-    use std::ptr::null_mut;
-
     unsafe {
-        let mut value = null_mut();
-
-        object_getInstanceVariable(this,
-                                   DELEGATE_WINDOW.as_ptr() as *const _,
-                                   &mut value);
-
-        assert!(value != nil as *mut _);
-
-        let window = value as *mut Window;
-
-        (*window).is_closed.set(true);
+        let window = get_window(this);
+        (*window).signal(Event::WindowClosed);
     }
-
     0
 }
 
-extern fn window_did_resize(_: id, _: id) -> id {
+extern fn window_did_resize(this: id, _: id) -> id {
+    unsafe {
+        let window = get_window(this);
+        (*window).signal(Event::WindowResized);
+    }
     0
+}
+
+unsafe fn get_window(this: id) -> *mut Window {
+    use cocoa::base::object_getInstanceVariable;
+    use std::ptr::null_mut;
+
+    let mut value = null_mut();
+
+    object_getInstanceVariable(this,
+                               DELEGATE_WINDOW.as_ptr() as *const _,
+                               &mut value);
+
+    assert!(value != nil as *mut _);
+
+    value as *mut _
 }
