@@ -1,7 +1,10 @@
-language: rust
+language: objective-c
 
-os:
-  - osx
+install:
+  - curl -s https://static.rust-lang.org/rustup.sh | sudo sh
+
+script:
+  - cargo build --verbose
 
 after_success:
   - curl https://stainless-steel.github.io/travis/after_success.sh | bash
