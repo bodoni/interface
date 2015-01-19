@@ -1,2 +1,11 @@
 language: rust
-os: osx
+
+os:
+  - osx
+
+after_success:
+  - curl https://stainless-steel.github.io/travis/after_success.sh | bash
+
+env:
+  global:
+    secure: KM+K0JjTuPj7JiNJz+2AMEPZQuqBCUkmCxUbgFitQQyyT3aNcXUIm8hMRzgSEMFeq36qJky8VmjYQzLJIVBmHK8QR4HypGCwLgc3X8T2Ee6E40ekUD7Gb4fuyCqnWJZ6BTtnu0wueQLhbFoy8CmamJ0ROHCQEwYV9/s535GEdyU=
