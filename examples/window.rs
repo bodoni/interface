@@ -2,10 +2,11 @@
 
 extern crate interface;
 
-use std::io::timer;
-use std::time::duration::Duration;
-
 fn main() {
-    let _ = interface::Window::new().unwrap();
-    timer::sleep(Duration::seconds(5));
+    let mut window = interface::Window::new().unwrap();
+
+    while !window.is_closed() {
+        window.react();
+        window.update();
+    }
 }
