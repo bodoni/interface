@@ -5,6 +5,7 @@ authors = ["Ivan Ukhov <ivan.ukhov@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/bodoni/interface"
 homepage = "https://github.com/bodoni/interface"
+documentation = "https://bodoni.github.io/interface"
 description = "An interface."
 
 [dependencies.cocoa]
