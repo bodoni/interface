@@ -7,8 +7,8 @@ use cocoa::base::{id, nil};
 use std::cell::Cell;
 use std::collections::RingBuf;
 
-static DELEGATE_NAME: &'static [u8] = b"InterfaceDelegate\0";
-static DELEGATE_WINDOW: &'static [u8] = b"interface_window";
+static DELEGATE_NAME: &'static [u8] = b"Interlocutor\0";
+static DELEGATE_WINDOW: &'static [u8] = b"window";
 
 #[derive(Show)]
 pub struct Error {
