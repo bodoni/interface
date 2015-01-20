@@ -1,47 +1,41 @@
 use cocoa::base::{id, nil};
 use std::collections::RingBuf;
 
-use ::{Error, Event, Result};
+use {Error, Event, Result};
 
-#[allow(dead_code, missing_copy_implementations)]
+#[allow(dead_code)]
 pub struct Window {
+    application: id,
     window: id,
     view: id,
     context: id,
-    delegate: id,
+
     events: RingBuf<Event>,
 }
 
 impl Window {
-    pub fn new() -> Result<Box<Window>> {
-        use cocoa::base::{msg_send, selector};
-        use cocoa::appkit::{NSApplication, NSOpenGLContext, NSWindow};
-
-        let mut w = Box::new(Window {
-            window: 0,
-            view: 0,
-            context: 0,
-            delegate: 0,
-            events: RingBuf::new(),
-        });
+    pub fn new() -> Result<Window> {
+        use cocoa::appkit::{NSApplication, NSWindow};
 
         unsafe {
             let application = some!(create_application(), "cannot create an application");
             application.activateIgnoringOtherApps_(true);
 
-            (*w).window = some!(create_window("Hello"), "cannot create a window");
-            (*w).window.makeKeyAndOrderFront_(nil);
+            let window = some!(create_window("Hello"), "cannot create a window");
+            window.makeKeyAndOrderFront_(nil);
 
-            (*w).view = some!(create_view((*w).window), "cannot create a view");
+            let view = some!(create_view(window), "cannot create a view");
+            let context = some!(create_context(view), "cannot create a context");
 
-            (*w).context = some!(create_context((*w).view), "cannot create a context");
-            let _: id = msg_send()((*w).context, selector("update"));
-            (*w).context.makeCurrentContext();
+            Ok(Window {
+                application: application,
+                window: window,
+                view: view,
+                context: context,
 
-            (*w).delegate = ::delegate::new((*w).window, &mut *w as *mut _);
+                events: RingBuf::new(),
+            })
         }
-
-        Ok(w)
     }
 
     pub fn react(&mut self) -> Option<Event> {
@@ -49,7 +43,7 @@ impl Window {
         self.events.pop_front()
     }
 
-    pub fn signal(&mut self, event: Event) {
+    pub fn send(&mut self, event: Event) {
         self.events.push_back(event);
     }
 
@@ -87,7 +81,7 @@ impl Window {
             NSApp().sendEvent_(event);
 
             match event.get_type() {
-                NSLeftMouseDown => self.signal(Event::LeftMouseDown),
+                NSLeftMouseDown => self.send(Event::LeftMouseDown),
                 _ => {},
             }
         }
@@ -191,4 +185,14 @@ unsafe fn create_context(view: id) -> Option<id> {
         context.setView_(view);
         Some(context)
     }
+}
+
+#[inline]
+pub fn get_window(window: &Window) -> id {
+    window.window
+}
+
+#[inline]
+pub fn get_context(window: &Window) -> id {
+    window.context
 }

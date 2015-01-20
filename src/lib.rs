@@ -16,7 +16,6 @@ mod support;
 mod error;
 mod result;
 
-mod delegate;
 mod event;
 mod opengl;
 mod window;
