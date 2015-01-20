@@ -14,7 +14,8 @@ pub struct Window {
 
 impl Window {
     pub fn new() -> Result<Box<Window>> {
-        use cocoa::appkit::{NSApplication, NSWindow};
+        use cocoa::base::{msg_send, selector};
+        use cocoa::appkit::{NSApplication, NSOpenGLContext, NSWindow};
 
         let mut w = Box::new(Window {
             window: 0,
@@ -32,7 +33,11 @@ impl Window {
             (*w).window.makeKeyAndOrderFront_(nil);
 
             (*w).view = some!(create_view((*w).window), "cannot create a view");
+
             (*w).context = some!(create_context((*w).view), "cannot create a context");
+            let _: id = msg_send()((*w).context, selector("update"));
+            (*w).context.makeCurrentContext();
+
             (*w).delegate = ::delegate::new((*w).window, &mut *w as *mut _);
         }
 
