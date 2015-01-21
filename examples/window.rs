@@ -13,7 +13,7 @@ fn main() {
     gl::load_with(|name| OpenGL::resolve(name));
     unsafe { gl::ClearColor(0.259, 0.545, 0.792, 1.0) };
 
-    Event::delegate(&mut window);
+    Event::notify(&mut window);
 
     loop {
         match window.react() {
