@@ -14,5 +14,5 @@ git = "https://github.com/servo/rust-cocoa"
 [dependencies.core_foundation]
 git = "https://github.com/servo/rust-core-foundation"
 
-[dev-dependencies.gl]
+[dependencies.gl]
 git = "https://github.com/bjz/gl-rs"
