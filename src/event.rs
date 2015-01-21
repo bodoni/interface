@@ -14,7 +14,7 @@ pub enum Event {
 
 impl Event {
     #[inline]
-    pub fn notify(window: &mut Window) {
+    pub fn subscribe(window: &mut Window) {
         unsafe { create_delegate(::window::get_window(window), window as *mut _) };
     }
 }
