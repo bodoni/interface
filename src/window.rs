@@ -1,11 +1,13 @@
 use cocoa::base::{id, nil};
 use std::collections::RingBuf;
+use std::sync::{Once, ONCE_INIT};
 
 use {Error, Event, Result};
 
+static APPLICATION: Once = ONCE_INIT;
+
 #[allow(dead_code)]
 pub struct Window {
-    application: id,
     window: id,
     view: id,
     context: id,
@@ -15,20 +17,20 @@ pub struct Window {
 
 impl Window {
     pub fn new() -> Result<Window> {
-        use cocoa::appkit::{NSApplication, NSWindow};
+        use cocoa::appkit::NSWindow;
+
+        APPLICATION.call_once(|| unsafe {
+            assert!(create_application().is_some());
+        });
 
         unsafe {
-            let application = some!(create_application(), "cannot create an application");
-            application.activateIgnoringOtherApps_(true);
-
             let window = some!(create_window("Hello"), "cannot create a window");
-            window.makeKeyAndOrderFront_(nil);
-
             let view = some!(create_view(window), "cannot create a view");
             let context = some!(create_context(view), "cannot create a context");
 
+            window.makeKeyAndOrderFront_(nil);
+
             Ok(Window {
-                application: application,
                 window: window,
                 view: view,
                 context: context,
@@ -98,6 +100,7 @@ unsafe fn create_application() -> Option<id> {
     } else {
         application.setActivationPolicy_(NSApplicationActivationPolicyRegular);
         application.finishLaunching();
+        application.activateIgnoringOtherApps_(true);
         Some(application)
     }
 }
