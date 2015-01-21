@@ -15,10 +15,9 @@ fn main() {
     loop {
         match window.react() {
             Some(WindowClosed) => break,
-            _ => {
-                unsafe { gl::raw::Clear(gl::raw::COLOR_BUFFER_BIT) };
-                window.update();
-            },
+            _ => {},
         }
+        unsafe { gl::raw::Clear(gl::raw::COLOR_BUFFER_BIT) };
+        window.update();
     }
 }
