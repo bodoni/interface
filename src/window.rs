@@ -153,8 +153,8 @@ unsafe fn create_view(window: id) -> Option<id> {
 }
 
 unsafe fn create_context(view: id) -> Option<id> {
-    use cocoa::appkit::NSOpenGLPFAOpenGLProfiles::NSOpenGLProfileVersion4_1Core;
     use cocoa::appkit::{NSOpenGLContext, NSOpenGLPixelFormat};
+    use cocoa::appkit::NSOpenGLPFAOpenGLProfiles::NSOpenGLProfileVersion4_1Core;
     use cocoa::appkit::NSOpenGLPixelFormatAttribute::{NSOpenGLPFAAlphaSize,
                                                       NSOpenGLPFAClosestPolicy,
                                                       NSOpenGLPFAColorSize,
