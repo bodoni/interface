@@ -4,7 +4,7 @@ use Window;
 pub struct OpenGL;
 
 impl OpenGL {
-    pub fn activate(window: &Window) {
+    pub fn select(window: &Window) {
         use cocoa::base::{id, msg_send, selector};
         use cocoa::appkit::NSOpenGLContext;
 
