@@ -2,8 +2,8 @@
 
 extern crate interface;
 
-use interface::{gl, Window};
-use interface::Event::{self, WindowClosed};
+use interface::gl;
+use interface::{Event, Window};
 
 fn main() {
     let mut window = Window::new().unwrap();
@@ -14,7 +14,7 @@ fn main() {
     Event::subscribe(&mut window);
     loop {
         match window.react() {
-            Some(WindowClosed) => break,
+            Some(Event::WindowClosed) => break,
             _ => {},
         }
         unsafe { gl::raw::Clear(gl::raw::COLOR_BUFFER_BIT) };
