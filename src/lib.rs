@@ -1,4 +1,4 @@
-#![allow(unstable)]
+#![feature(libc, std_misc)]
 
 extern crate cocoa;
 extern crate core_foundation;

@@ -1,4 +1,4 @@
-use cocoa::base::{id, nil};
+use cocoa::base::{id, nil, NO, YES};
 use std::collections::RingBuf;
 use std::sync::{Once, ONCE_INIT};
 
@@ -58,23 +58,23 @@ impl Window {
     unsafe fn poll(&mut self) {
         use cocoa::appkit::{NSApp, NSApplication, NSDate, NSEvent};
         use cocoa::appkit::NSDefaultRunLoopMode;
-        use cocoa::appkit::NSEventMask::NSAnyEventMask;
+        use cocoa::appkit::NSAnyEventMask;
         use cocoa::appkit::NSEventType::NSLeftMouseDown;
 
         let event = NSApp().nextEventMatchingMask_untilDate_inMode_dequeue_(
-            NSAnyEventMask as u64,
+            NSAnyEventMask.bits(),
             NSDate::distantFuture(nil),
             NSDefaultRunLoopMode,
-            false);
+            NO);
 
         NSApp().sendEvent_(event);
 
         loop {
             let event = NSApp().nextEventMatchingMask_untilDate_inMode_dequeue_(
-                NSAnyEventMask as u64,
+                NSAnyEventMask.bits(),
                 NSDate::distantPast(nil),
                 NSDefaultRunLoopMode,
-                true);
+                YES);
 
             if is_nil!(event) {
                 break;
@@ -82,7 +82,7 @@ impl Window {
 
             NSApp().sendEvent_(event);
 
-            match event.get_type() {
+            match event.eventType() {
                 NSLeftMouseDown => self.send(Event::LeftMouseDown),
                 _ => {},
             }
@@ -100,7 +100,7 @@ unsafe fn create_application() -> Option<id> {
     } else {
         application.setActivationPolicy_(NSApplicationActivationPolicyRegular);
         application.finishLaunching();
-        application.activateIgnoringOtherApps_(true);
+        application.activateIgnoringOtherApps_(YES);
         Some(application)
     }
 }
@@ -126,14 +126,14 @@ unsafe fn create_window(title: &str) -> Option<id> {
         frame,
         masks,
         NSBackingStoreBuffered,
-        false);
+        NO);
 
     if is_nil!(window) {
         None
     } else {
         let title = NSString::alloc(nil).init_str(title);
         window.setTitle_(title);
-        window.setAcceptsMouseMovedEvents_(true);
+        window.setAcceptsMouseMovedEvents_(YES);
         window.center();
         Some(window)
     }
@@ -146,7 +146,7 @@ unsafe fn create_view(window: id) -> Option<id> {
     if is_nil!(view) {
         None
     } else {
-        view.setWantsBestResolutionOpenGLSurface_(true);
+        view.setWantsBestResolutionOpenGLSurface_(YES);
         window.setContentView_(view);
         Some(view)
     }

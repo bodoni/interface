@@ -1,5 +1,3 @@
-#![allow(unstable)]
-
 extern crate interface;
 
 use interface::gl;

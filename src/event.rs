@@ -5,7 +5,7 @@ use Window;
 const DELEGATE_NAME: &'static [u8] = b"Delegate\0";
 const DELEGATE_IVAR: &'static [u8] = b"data";
 
-#[derive(Clone, Copy, Show)]
+#[derive(Clone, Copy, Debug)]
 pub enum Event {
     LeftMouseDown,
     WindowClosed,
