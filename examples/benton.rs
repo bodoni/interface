@@ -1,4 +1,4 @@
-#![feature(core, path, std_misc, unsafe_destructor)]
+#![feature(path, std_misc, unsafe_destructor)]
 
 extern crate interface;
 extern crate svg;
