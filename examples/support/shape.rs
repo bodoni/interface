@@ -64,14 +64,16 @@ fn construct(data: &path::Data) -> Vec<f32> {
     use svg::path::Positioning::*;
 
     const CURVE_NODES: usize = 11;
+    const WIDTH: f64 = 800.0;
+    const HEIGHT: f64 = 800.0;
 
     let (mut x, mut y) = (0.0, 0.0);
     let mut new = true;
 
     #[inline(always)]
     fn push(array: &mut Vec<f32>, x: f64, y: f64) {
-        array.push((x / 800.0 - 0.5) as f32);
-        array.push((y / 800.0 - 0.5) as f32);
+        array.push((x / WIDTH - 0.5) as f32);
+        array.push((y / HEIGHT - 0.5) as f32);
     }
 
     #[inline(always)]
