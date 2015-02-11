@@ -115,7 +115,7 @@ unsafe fn create_window(title: &str) -> Option<id> {
                                       NSTitledWindowMask};
     use cocoa::appkit::NSBackingStoreType::NSBackingStoreBuffered;
 
-    let frame = NSRect::new(NSPoint::new(0.0, 0.0), NSSize::new(800.0, 600.0));
+    let frame = NSRect::new(NSPoint::new(0.0, 0.0), NSSize::new(500.0, 500.0));
 
     let masks = NSClosableWindowMask as NSUInteger |
                 NSMiniaturizableWindowMask as NSUInteger |
