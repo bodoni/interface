@@ -31,14 +31,19 @@ impl Shape {
     }
 
     pub fn render(&self) {
+        use std::mem::size_of;
+
+        let count = self.array.len() / 2;
+        let size = 2 * size_of::<f32>() * count;
+
         unsafe {
             ok!(raw::BindBuffer(raw::ARRAY_BUFFER, self.buffer));
             ok!(raw::VertexAttribPointer(0, 2, raw::FLOAT, raw::FALSE, 0, 0 as *const _));
 
-            ok!(raw::BufferData(raw::ARRAY_BUFFER, self.array.len() as i64,
-                            (&self.array[]).as_ptr() as *const _, raw::STATIC_DRAW));
+            ok!(raw::BufferData(raw::ARRAY_BUFFER, size as i64,
+                                (&self.array[]).as_ptr() as *const _, raw::STATIC_DRAW));
 
-            ok!(raw::DrawArrays(raw::LINE_LOOP, 0, self.array.len() as i32));
+            ok!(raw::DrawArrays(raw::LINE_STRIP, 0, count as i32));
         }
     }
 }
@@ -133,11 +138,7 @@ fn construct(data: &path::Data) -> Vec<f32> {
                     push(&mut array, x, y);
                 }
             },
-            ClosePath => {
-                let (x, y) = (array[0], array[1]);
-                array.push(x);
-                array.push(y);
-            },
+            ClosePath => {},
             _ => {}
         }
     }
