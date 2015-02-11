@@ -2,6 +2,7 @@ use interface::gl::raw;
 use interface::gl::raw::types::GLuint;
 use svg::path;
 
+use support::bezier;
 use support::Bunch;
 
 pub struct Shape {
@@ -62,6 +63,8 @@ fn construct(data: &path::Data) -> Vec<f32> {
     use svg::path::Command::*;
     use svg::path::Positioning::*;
 
+    const CURVE_NODES: usize = 11;
+
     let (mut x, mut y) = (0.0, 0.0);
     let mut new = true;
 
@@ -71,7 +74,13 @@ fn construct(data: &path::Data) -> Vec<f32> {
         array.push((y / 800.0 - 0.5) as f32);
     }
 
+    #[inline(always)]
+    fn reflect(x: f64, x0: f64) -> f64 {
+        x0 - (x - x0)
+    }
+
     let mut array = Vec::new();
+    let mut control = None;
 
     for command in data.iter() {
         match *command {
@@ -112,30 +121,60 @@ fn construct(data: &path::Data) -> Vec<f32> {
             },
             CurveTo(Absolute, ref parameters) => {
                 for bunch in Bunch::new(&parameters[], 6) {
+                    for (x, y) in bezier::Cubic::new(CURVE_NODES,
+                                                     x, y,
+                                                     bunch[0], bunch[1],
+                                                     bunch[2], bunch[3],
+                                                     bunch[4], bunch[5]) {
+                        push(&mut array, x, y);
+                    }
+                    control = Some((bunch[2], bunch[3]));
                     x = bunch[4];
                     y = bunch[5];
-                    push(&mut array, x, y);
                 }
             },
             CurveTo(Relative, ref parameters) => {
                 for bunch in Bunch::new(&parameters[], 6) {
+                    for (x, y) in bezier::Cubic::new(CURVE_NODES,
+                                                     x, y,
+                                                     x + bunch[0], y + bunch[1],
+                                                     x + bunch[2], y + bunch[3],
+                                                     x + bunch[4], y + bunch[5]) {
+                        push(&mut array, x, y);
+                    }
+                    control = Some((x + bunch[2], y + bunch[3]));
                     x += bunch[4];
                     y += bunch[5];
-                    push(&mut array, x, y);
                 }
             },
             SmoothCurveTo(Absolute, ref parameters) => {
                 for bunch in Bunch::new(&parameters[], 4) {
+                    let (x1, y1) = control.unwrap();
+                    for (x, y) in bezier::Cubic::new(CURVE_NODES,
+                                                     x, y,
+                                                     reflect(x1, x), reflect(y1, y),
+                                                     bunch[0], bunch[1],
+                                                     bunch[2], bunch[3]) {
+                        push(&mut array, x, y);
+                    }
+                    control = Some((bunch[0], bunch[1]));
                     x = bunch[2];
                     y = bunch[3];
-                    push(&mut array, x, y);
                 }
             },
             SmoothCurveTo(Relative, ref parameters) => {
                 for bunch in Bunch::new(&parameters[], 4) {
+                    let (x1, y1) = control.unwrap();
+                    for (x, y) in bezier::Cubic::new(CURVE_NODES,
+                                                     x, y,
+                                                     reflect(x1, x), reflect(y1, y),
+                                                     x + bunch[0], y + bunch[1],
+                                                     x + bunch[2], y + bunch[3]) {
+                        push(&mut array, x, y);
+                    }
+                    control = Some((x + bunch[0], y + bunch[1]));
                     x += bunch[2];
                     y += bunch[3];
-                    push(&mut array, x, y);
                 }
             },
             ClosePath => {},

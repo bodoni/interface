@@ -1,3 +1,4 @@
+mod bezier;
 mod bunch;
 mod scene;
 mod shader;
