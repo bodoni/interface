@@ -42,7 +42,7 @@ impl Shape {
             ok!(raw::VertexAttribPointer(0, 2, raw::FLOAT, raw::FALSE, 0, 0 as *const _));
 
             ok!(raw::BufferData(raw::ARRAY_BUFFER, size as i64,
-                                (&self.array[]).as_ptr() as *const _, raw::STATIC_DRAW));
+                                self.array.as_ptr() as *const _, raw::STATIC_DRAW));
 
             ok!(raw::DrawArrays(raw::LINE_STRIP, 0, count as i32));
         }
@@ -96,33 +96,33 @@ fn construct(data: &path::Data) -> Vec<f32> {
 
         match *command {
             MoveTo(Absolute, ref parameters) => {
-                for bunch in Bunch::new(&parameters[], 2) {
+                for bunch in Bunch::new(parameters, 2) {
                     x = bunch[0];
                     y = bunch[1];
                 }
             },
             MoveTo(Relative, ref parameters) => {
-                for bunch in Bunch::new(&parameters[], 2) {
+                for bunch in Bunch::new(parameters, 2) {
                     x += bunch[0];
                     y += bunch[1];
                 }
             },
             LineTo(Absolute, ref parameters) => {
-                for bunch in Bunch::new(&parameters[], 2) {
+                for bunch in Bunch::new(parameters, 2) {
                     x = bunch[0];
                     y = bunch[1];
                     push(&mut array, x, y);
                 }
             },
             LineTo(Relative, ref parameters) => {
-                for bunch in Bunch::new(&parameters[], 2) {
+                for bunch in Bunch::new(parameters, 2) {
                     x += bunch[0];
                     y += bunch[1];
                     push(&mut array, x, y);
                 }
             },
             CurveTo(Absolute, ref parameters) => {
-                for bunch in Bunch::new(&parameters[], 6) {
+                for bunch in Bunch::new(parameters, 6) {
                     for (x, y) in bezier::Cubic::new(CURVE_NODES,
                                                      x, y,
                                                      bunch[0], bunch[1],
@@ -136,7 +136,7 @@ fn construct(data: &path::Data) -> Vec<f32> {
                 }
             },
             CurveTo(Relative, ref parameters) => {
-                for bunch in Bunch::new(&parameters[], 6) {
+                for bunch in Bunch::new(parameters, 6) {
                     for (x, y) in bezier::Cubic::new(CURVE_NODES,
                                                      x, y,
                                                      x + bunch[0], y + bunch[1],
@@ -150,7 +150,7 @@ fn construct(data: &path::Data) -> Vec<f32> {
                 }
             },
             SmoothCurveTo(Absolute, ref parameters) => {
-                for bunch in Bunch::new(&parameters[], 4) {
+                for bunch in Bunch::new(parameters, 4) {
                     let (x1, y1) = control.unwrap();
                     for (x, y) in bezier::Cubic::new(CURVE_NODES,
                                                      x, y,
@@ -165,7 +165,7 @@ fn construct(data: &path::Data) -> Vec<f32> {
                 }
             },
             SmoothCurveTo(Relative, ref parameters) => {
-                for bunch in Bunch::new(&parameters[], 4) {
+                for bunch in Bunch::new(parameters, 4) {
                     let (x1, y1) = control.unwrap();
                     for (x, y) in bezier::Cubic::new(CURVE_NODES,
                                                      x, y,

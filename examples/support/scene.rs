@@ -1,4 +1,5 @@
 use std::ffi::CString;
+use std::path::Path;
 
 use interface::gl;
 use interface::gl::raw;
@@ -61,7 +62,7 @@ impl Scene {
 }
 
 unsafe fn create_shader(code: &[u8], typo: GLenum) -> GLuint {
-    let code = CString::from_slice(code);
+    let code = CString::new(code).unwrap();
 
     let shader = raw::CreateShader(typo);
     ok!(raw::ShaderSource(shader, 1, &code.as_ptr(), 0 as *const _));
@@ -89,7 +90,7 @@ unsafe fn create_program() {
     ok!(raw::LinkProgram(program));
     ok!(raw::UseProgram(program));
 
-    let position = CString::from_slice(b"position");
+    let position = CString::new("position").unwrap();
     let position = raw::GetAttribLocation(program, position.as_ptr() as *const _);
     assert!(position == 0);
 

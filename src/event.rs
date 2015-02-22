@@ -36,18 +36,18 @@ unsafe fn create_delegate(window: id, data: *mut Window) -> id {
     class_addMethod(delegate,
                     selector("windowShouldClose:"),
                     window_should_close,
-                    CString::from_slice("B@:@".as_bytes()).as_ptr());
+                    CString::new("B@:@").unwrap().as_ptr());
 
     class_addMethod(delegate,
                     selector("windowDidResize:"),
                     window_did_resize,
-                    CString::from_slice("V@:@".as_bytes()).as_ptr());
+                    CString::new("V@:@").unwrap().as_ptr());
 
     class_addIvar(delegate,
                   DELEGATE_IVAR.as_ptr() as *const _,
                   size_of::<intptr_t>() as u64,
                   3 /* log2(8) */,
-                  CString::from_slice("?".as_bytes()).as_ptr());
+                  CString::new("?").unwrap().as_ptr());
 
     objc_registerClassPair(delegate);
 

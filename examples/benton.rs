@@ -3,6 +3,8 @@
 extern crate interface;
 extern crate svg;
 
+use std::path::Path;
+
 use support::Scene;
 
 mod support;

@@ -1,5 +1,5 @@
 use cocoa::base::{id, nil, NO, YES};
-use std::collections::RingBuf;
+use std::collections::VecDeque;
 use std::sync::{Once, ONCE_INIT};
 
 use {Error, Event, Result};
@@ -12,7 +12,7 @@ pub struct Window {
     view: id,
     context: id,
 
-    events: RingBuf<Event>,
+    events: VecDeque<Event>,
 }
 
 impl Window {
@@ -35,7 +35,7 @@ impl Window {
                 view: view,
                 context: context,
 
-                events: RingBuf::new(),
+                events: VecDeque::new(),
             })
         }
     }
