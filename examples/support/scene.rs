@@ -1,11 +1,7 @@
+use gl::types::{GLenum, GLuint};
+use gl;
 use std::ffi::CString;
 use std::path::Path;
-
-use interface::gl;
-use interface::gl::raw;
-use interface::gl::raw::types::{GLenum, GLuint};
-use interface::Window;
-
 use svg;
 
 use support::Shape;
@@ -13,7 +9,7 @@ use support::Shape;
 macro_rules! ok(
     ($code:expr) => ({
         let result = $code;
-        assert_eq!(raw::GetError(), raw::NO_ERROR);
+        assert_eq!(gl::GetError(), gl::NO_ERROR);
         result
     });
 );
@@ -23,11 +19,9 @@ pub struct Scene {
 }
 
 impl Scene {
-    pub fn new(window: &Window, path: &Path) -> Scene {
+    pub fn new<T: AsRef<Path>>(path: T) -> Scene {
         use svg::{Event, Tag};
         use svg::path::Data;
-
-        gl::select(window);
 
         let file = svg::open(path).unwrap();
         let mut shapes = Vec::new();
@@ -44,15 +38,13 @@ impl Scene {
 
         unsafe { create_program() };
 
-        Scene{
-            shapes: shapes,
-        }
+        Scene { shapes: shapes }
     }
 
     pub fn render(&self) {
         unsafe {
-            raw::ClearColor(1.0, 1.0, 1.0, 1.0);
-            raw::Clear(raw::COLOR_BUFFER_BIT);
+            gl::ClearColor(1.0, 1.0, 1.0, 1.0);
+            gl::Clear(gl::COLOR_BUFFER_BIT);
         };
 
         for shape in self.shapes.iter() {
@@ -64,13 +56,13 @@ impl Scene {
 unsafe fn create_shader(code: &[u8], typo: GLenum) -> GLuint {
     let code = CString::new(code).unwrap();
 
-    let shader = raw::CreateShader(typo);
-    ok!(raw::ShaderSource(shader, 1, &code.as_ptr(), 0 as *const _));
-    ok!(raw::CompileShader(shader));
+    let shader = gl::CreateShader(typo);
+    ok!(gl::ShaderSource(shader, 1, &code.as_ptr(), 0 as *const _));
+    ok!(gl::CompileShader(shader));
 
     let /* mut */ status = 0;
-    raw::GetShaderiv(shader, raw::COMPILE_STATUS, &status as *const _ as *mut _);
-    assert!(status == raw::TRUE);
+    gl::GetShaderiv(shader, gl::COMPILE_STATUS, &status as *const _ as *mut _);
+    assert!(status == gl::TRUE);
 
     shader
 }
@@ -78,28 +70,27 @@ unsafe fn create_shader(code: &[u8], typo: GLenum) -> GLuint {
 unsafe fn create_program() {
     use support::shader;
 
-    let vertex = create_shader(shader::VERTEX, raw::VERTEX_SHADER);
-    let fragment = create_shader(shader::FRAGMENT, raw::FRAGMENT_SHADER);
+    let vertex = create_shader(shader::VERTEX, gl::VERTEX_SHADER);
+    let fragment = create_shader(shader::FRAGMENT, gl::FRAGMENT_SHADER);
 
-    let program = raw::CreateProgram();
+    let program = gl::CreateProgram();
     assert!(program != 0);
 
-    ok!(raw::AttachShader(program, vertex));
-    ok!(raw::AttachShader(program, fragment));
+    ok!(gl::AttachShader(program, vertex));
+    ok!(gl::AttachShader(program, fragment));
 
-    ok!(raw::LinkProgram(program));
-    ok!(raw::UseProgram(program));
+    ok!(gl::LinkProgram(program));
+    ok!(gl::UseProgram(program));
 
     let position = CString::new("position").unwrap();
-    let position = raw::GetAttribLocation(program, position.as_ptr() as *const _);
+    let position = gl::GetAttribLocation(program, position.as_ptr() as *const _);
     assert!(position == 0);
 
-    ok!(raw::VertexAttribPointer(position as GLuint, 2, raw::FLOAT,
-                                 raw::FALSE, 0, 0 as *const _));
+    ok!(gl::VertexAttribPointer(position as GLuint, 2, gl::FLOAT, gl::FALSE, 0, 0 as *const _));
 
     let array = 0;
-    ok!(raw::GenVertexArrays(1, &array as *const _ as *mut _));
-    ok!(raw::BindVertexArray(array));
+    ok!(gl::GenVertexArrays(1, &array as *const _ as *mut _));
+    ok!(gl::BindVertexArray(array));
 
-    ok!(raw::EnableVertexAttribArray(position as GLuint));
+    ok!(gl::EnableVertexAttribArray(position as GLuint));
 }

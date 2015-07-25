@@ -1,21 +1,23 @@
-extern crate interface;
+extern crate gl;
+extern crate glutin;
 
-use interface::gl;
-use interface::{Event, Window};
+use glutin::{Event, Window};
 
 fn main() {
-    let mut window = Window::new().unwrap();
+    let window = Window::new().unwrap();
 
-    gl::select(&window);
-    unsafe { gl::raw::ClearColor(0.259, 0.545, 0.792, 1.0) };
+    unsafe {
+        window.make_current().unwrap();
+        gl::load_with(|symbol| window.get_proc_address(symbol));
+        gl::ClearColor(0.259, 0.545, 0.792, 1.0);
+    }
 
-    Event::subscribe(&mut window);
-    loop {
-        match window.react() {
-            Some(Event::WindowClosed) => break,
-            _ => {},
+    for event in window.wait_events() {
+        match event {
+            Event::Closed => break,
+            _ => ()
         }
-        unsafe { gl::raw::Clear(gl::raw::COLOR_BUFFER_BIT) };
-        window.update();
+        unsafe { gl::Clear(gl::COLOR_BUFFER_BIT) };
+        window.swap_buffers().unwrap();
     }
 }

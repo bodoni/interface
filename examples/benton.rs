@@ -1,27 +1,30 @@
-#![feature(path, std_misc, unsafe_destructor)]
-
-extern crate interface;
 extern crate svg;
+extern crate gl;
+extern crate glutin;
 
-use std::path::Path;
+use glutin::{Event, Window};
 
 use support::Scene;
 
 mod support;
 
 fn main() {
-    use interface::{Event, Window};
+    let window = Window::new().unwrap();
+    window.set_inner_size(600, 600);
 
-    let mut window = Window::new().unwrap();
-    let scene = Scene::new(&window, &Path::new("examples/benton.svg"));
+    unsafe {
+        window.make_current().unwrap();
+        gl::load_with(|symbol| window.get_proc_address(symbol));
+    }
 
-    Event::subscribe(&mut window);
-    loop {
-        match window.react() {
-            Some(Event::WindowClosed) => break,
-            _ => {},
+    let scene = Scene::new("examples/benton.svg");
+
+    for event in window.wait_events() {
+        match event {
+            Event::Closed => break,
+            _ => ()
         }
         scene.render();
-        window.update();
+        window.swap_buffers().unwrap();
     }
 }

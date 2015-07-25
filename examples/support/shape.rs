@@ -1,5 +1,5 @@
-use interface::gl::raw;
-use interface::gl::raw::types::GLuint;
+use gl::types::GLuint;
+use gl;
 use svg::path;
 
 use support::bezier;
@@ -13,7 +13,7 @@ pub struct Shape {
 macro_rules! ok(
     ($code:expr) => ({
         let result = $code;
-        assert_eq!(raw::GetError(), raw::NO_ERROR);
+        assert_eq!(gl::GetError(), gl::NO_ERROR);
         result
     });
 );
@@ -24,8 +24,8 @@ impl Shape {
         Shape {
             array: construct(data),
             buffer: unsafe {
-                let /* mut */ buffer = 0;
-                ok!(raw::GenBuffers(1, &buffer as *const _ as *mut _));
+                let buffer = 0;
+                ok!(gl::GenBuffers(1, &buffer as *const _ as *mut _));
                 buffer
             },
         }
@@ -38,23 +38,22 @@ impl Shape {
         let size = 2 * size_of::<f32>() * count;
 
         unsafe {
-            ok!(raw::BindBuffer(raw::ARRAY_BUFFER, self.buffer));
-            ok!(raw::VertexAttribPointer(0, 2, raw::FLOAT, raw::FALSE, 0, 0 as *const _));
+            ok!(gl::BindBuffer(gl::ARRAY_BUFFER, self.buffer));
+            ok!(gl::VertexAttribPointer(0, 2, gl::FLOAT, gl::FALSE, 0, 0 as *const _));
 
-            ok!(raw::BufferData(raw::ARRAY_BUFFER, size as i64,
-                                self.array.as_ptr() as *const _, raw::STATIC_DRAW));
+            ok!(gl::BufferData(gl::ARRAY_BUFFER, size as i64, self.array.as_ptr() as *const _,
+                               gl::STATIC_DRAW));
 
-            ok!(raw::DrawArrays(raw::LINE_STRIP, 0, count as i32));
+            ok!(gl::DrawArrays(gl::LINE_STRIP, 0, count as i32));
         }
     }
 }
 
-#[unsafe_destructor]
 impl Drop for Shape {
     #[inline]
     fn drop(&mut self) {
         unsafe {
-            raw::DeleteBuffers(1, &self.buffer as *const _ as *mut _);
+            gl::DeleteBuffers(1, &self.buffer as *const _ as *mut _);
         }
     }
 }

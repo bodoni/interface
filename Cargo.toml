@@ -8,14 +8,9 @@ homepage = "https://github.com/bodoni/interface"
 documentation = "https://bodoni.github.io/interface"
 description = "An interface."
 
-[dependencies.cocoa]
-git = "https://github.com/servo/rust-cocoa"
-
-[dependencies.core_foundation]
-git = "https://github.com/servo/rust-core-foundation"
-
-[dependencies.gl]
-git = "https://github.com/bjz/gl-rs"
+[dependencies]
+gl = "*"
+glutin = "*"
 
 [dev-dependencies]
 svg = "*"
