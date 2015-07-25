@@ -1,10 +1,8 @@
-language: objective-c
+language: rust
+sudo: false
 
-install:
-  - curl -s https://static.rust-lang.org/rustup.sh | sudo sh
-
-script:
-  - cargo build --verbose
+os:
+  - osx
 
 after_success:
   - curl https://bodoni.github.io/travis/after_success.sh | bash
