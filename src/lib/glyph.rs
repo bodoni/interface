@@ -1,94 +1,65 @@
-use gl::types::GLuint;
-use gl;
-use svg::path;
+use curve::bezier;
+use glium::index::{NoIndices, PrimitiveType};
+use postscript::type2::Program;
 
-use support::bezier;
-use support::Bunch;
+use Result;
+use object::Object;
 
-pub struct Shape {
-    array: Vec<f32>,
-    buffer: GLuint,
+#[derive(Copy, Clone)]
+struct Vertex {
+    position: [f32; 2],
 }
 
-macro_rules! ok(
-    ($code:expr) => ({
-        let result = $code;
-        assert_eq!(gl::GetError(), gl::NO_ERROR);
-        result
-    });
-);
+implement_vertex!(Vertex, position);
 
-impl Shape {
+pub struct Glyph {
+    indices: NoIndices,
+    buffer: VertexBuffer,
+}
+
+impl Glyph {
     #[inline]
-    pub fn new(data: &path::Data) -> Shape {
-        Shape {
-            array: construct(data),
-            buffer: unsafe {
-                let buffer = 0;
-                ok!(gl::GenBuffers(1, &buffer as *const _ as *mut _));
-                buffer
-            },
-        }
-    }
-
-    pub fn render(&self) {
-        use std::mem::size_of;
-
-        let count = self.array.len() / 2;
-        let size = 2 * size_of::<f32>() * count;
-
-        unsafe {
-            ok!(gl::BindBuffer(gl::ARRAY_BUFFER, self.buffer));
-            ok!(gl::VertexAttribPointer(0, 2, gl::FLOAT, gl::FALSE, 0, 0 as *const _));
-
-            ok!(gl::BufferData(gl::ARRAY_BUFFER, size as i64, self.array.as_ptr() as *const _,
-                               gl::STATIC_DRAW));
-
-            ok!(gl::DrawArrays(gl::LINE_STRIP, 0, count as i32));
-        }
+    pub fn new<'l>(window: &Window, program: Program<'l>) -> Result<Glyph> {
+        let indices = NoIndices(PrimitiveType::LineStrip);
+        let buffer = ok!(VertexBuffer::new(window, try!(construct(program))));
+        Ok(Glyph { indices: indices, buffer: buffer })
     }
 }
 
-impl Drop for Shape {
-    #[inline]
-    fn drop(&mut self) {
-        unsafe {
-            gl::DeleteBuffers(1, &self.buffer as *const _ as *mut _);
-        }
+impl Object for Glyph {
+    fn render(&self) -> Result<()> {
+        Ok(())
     }
 }
 
-fn construct(data: &path::Data) -> Vec<f32> {
-    use svg::path::Command::*;
-    use svg::path::Positioning::*;
-
-    const CURVE_NODES: usize = 11;
-    const WIDTH: f64 = 800.0;
-    const HEIGHT: f64 = 800.0;
+fn construct<'l>(mut program: Program<'l>) -> Result<Vec<Vertex>> {
+    const STEPS: usize = 11;
+    const WIDTH: f32 = 800.0;
+    const HEIGHT: f32 = 800.0;
 
     let (mut x, mut y) = (0.0, 0.0);
     let mut new = true;
 
     #[inline(always)]
-    fn push(array: &mut Vec<f32>, x: f64, y: f64) {
-        array.push((x / WIDTH - 0.5) as f32);
-        array.push((y / HEIGHT - 0.5) as f32);
+    fn push(vertices: &mut Vec<f32>, x: f32, y: f32) {
+        vertices.push(x / WIDTH - 0.5);
+        vertices.push(y / HEIGHT - 0.5);
     }
 
     #[inline(always)]
-    fn reflect(x: f64, x0: f64) -> f64 {
+    fn reflect(x: f32, x0: f32) -> f32 {
         x0 - (x - x0)
     }
 
-    let mut array = Vec::new();
+    let mut vertices = Vec::new();
     let mut control = None;
 
-    for command in data.iter() {
+    while Some((operator, arguments)) = ok!(program.next()) {
         match *command {
             MoveTo(..) => new = true,
             ClosePath => {},
             _ => if new {
-                push(&mut array, x, y);
+                push(&mut vertices, x, y);
                 new = false;
             },
         }
@@ -110,24 +81,24 @@ fn construct(data: &path::Data) -> Vec<f32> {
                 for bunch in Bunch::new(parameters, 2) {
                     x = bunch[0];
                     y = bunch[1];
-                    push(&mut array, x, y);
+                    push(&mut vertices, x, y);
                 }
             },
             LineTo(Relative, ref parameters) => {
                 for bunch in Bunch::new(parameters, 2) {
                     x += bunch[0];
                     y += bunch[1];
-                    push(&mut array, x, y);
+                    push(&mut vertices, x, y);
                 }
             },
             CurveTo(Absolute, ref parameters) => {
                 for bunch in Bunch::new(parameters, 6) {
-                    for (x, y) in bezier::Cubic::new(CURVE_NODES,
+                    for (x, y) in bezier::Cubic::new(STEPS,
                                                      x, y,
                                                      bunch[0], bunch[1],
                                                      bunch[2], bunch[3],
                                                      bunch[4], bunch[5]) {
-                        push(&mut array, x, y);
+                        push(&mut vertices, x, y);
                     }
                     control = Some((bunch[2], bunch[3]));
                     x = bunch[4];
@@ -136,12 +107,12 @@ fn construct(data: &path::Data) -> Vec<f32> {
             },
             CurveTo(Relative, ref parameters) => {
                 for bunch in Bunch::new(parameters, 6) {
-                    for (x, y) in bezier::Cubic::new(CURVE_NODES,
+                    for (x, y) in bezier::Cubic::new(STEPS,
                                                      x, y,
                                                      x + bunch[0], y + bunch[1],
                                                      x + bunch[2], y + bunch[3],
                                                      x + bunch[4], y + bunch[5]) {
-                        push(&mut array, x, y);
+                        push(&mut vertices, x, y);
                     }
                     control = Some((x + bunch[2], y + bunch[3]));
                     x += bunch[4];
@@ -151,12 +122,12 @@ fn construct(data: &path::Data) -> Vec<f32> {
             SmoothCurveTo(Absolute, ref parameters) => {
                 for bunch in Bunch::new(parameters, 4) {
                     let (x1, y1) = control.unwrap();
-                    for (x, y) in bezier::Cubic::new(CURVE_NODES,
+                    for (x, y) in bezier::Cubic::new(STEPS,
                                                      x, y,
                                                      reflect(x1, x), reflect(y1, y),
                                                      bunch[0], bunch[1],
                                                      bunch[2], bunch[3]) {
-                        push(&mut array, x, y);
+                        push(&mut vertices, x, y);
                     }
                     control = Some((bunch[0], bunch[1]));
                     x = bunch[2];
@@ -166,12 +137,12 @@ fn construct(data: &path::Data) -> Vec<f32> {
             SmoothCurveTo(Relative, ref parameters) => {
                 for bunch in Bunch::new(parameters, 4) {
                     let (x1, y1) = control.unwrap();
-                    for (x, y) in bezier::Cubic::new(CURVE_NODES,
+                    for (x, y) in bezier::Cubic::new(STEPS,
                                                      x, y,
                                                      reflect(x1, x), reflect(y1, y),
                                                      x + bunch[0], y + bunch[1],
                                                      x + bunch[2], y + bunch[3]) {
-                        push(&mut array, x, y);
+                        push(&mut vertices, x, y);
                     }
                     control = Some((x + bunch[0], y + bunch[1]));
                     x += bunch[2];
@@ -183,5 +154,5 @@ fn construct(data: &path::Data) -> Vec<f32> {
         }
     }
 
-    array
+    vertices
 }

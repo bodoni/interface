@@ -9,8 +9,19 @@ documentation = "https://bodoni.github.io/interface"
 description = "An interface."
 
 [dependencies]
-gl = "*"
-glutin = "*"
+curve = "*"
+opentype = "*"
+postscript = "*"
 
-[dev-dependencies]
-svg = "*"
+[dependencies.glium]
+default-features = false
+features = ["glutin"]
+
+[[bin]]
+name = "interface"
+path = "src/bin/interface.rs"
+test = false
+
+[lib]
+name = "interface"
+path = "src/lib/interface.rs"
