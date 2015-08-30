@@ -1,8 +1,6 @@
-use glium::Program;
-use glium::glutin::Window;
+use glium::{Display, Program};
 
-use Result;
-use object::Object;
+use {Object, Result};
 
 pub struct Scene {
     program: Program,
@@ -11,8 +9,8 @@ pub struct Scene {
 
 impl Scene {
     #[inline]
-    pub fn new(window: &Window) -> Result<Scene> {
-        let program = ok!(Program::from_source(window, VERTEX_SHADER, FRAGMENT_SHADER, None));
+    pub fn new(display: &Display) -> Result<Scene> {
+        let program = ok!(Program::from_source(display, VERTEX_SHADER, FRAGMENT_SHADER, None));
         Ok(Scene { program: program, objects: vec![] })
     }
 

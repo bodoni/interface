@@ -13,10 +13,18 @@ pub struct Error(String);
 /// A result.
 pub type Result<T> = std::result::Result<T, Error>;
 
+pub trait Object {
+    fn render(&self) -> Result<()>;
+}
+
 macro_rules! ok(
     ($result:expr) => (match $result {
         Ok(ok) => ok,
         Err(error) => raise!(error),
+    });
+    ($result:expr, $($argument:tt)+) => (match $result {
+        Ok(ok) => ok,
+        Err(..) => raise!($($argument)+),
     });
 );
 
@@ -44,5 +52,7 @@ impl error::Error for Error {
 }
 
 mod glyph;
-mod object;
 mod scene;
+
+pub use glyph::Glyph;
+pub use scene::Scene;
