@@ -9,11 +9,12 @@ documentation = "https://bodoni.github.io/interface"
 description = "An interface."
 
 [dependencies]
-curve = "*"
-opentype = "*"
-postscript = "*"
+curve = "0.2"
+opentype = "0.4"
+postscript = "0.2"
 
 [dependencies.glium]
+version = "0.13"
 default-features = false
 features = ["glutin"]
 
