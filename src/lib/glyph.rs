@@ -1,4 +1,3 @@
-use curve::bezier;
 use glium::index::{NoIndices, PrimitiveType};
 use glium::{Display, VertexBuffer};
 use postscript::type2::Program;
@@ -12,6 +11,7 @@ struct Vertex {
 
 implement_vertex!(Vertex, position);
 
+#[allow(dead_code)]
 pub struct Glyph {
     indices: NoIndices,
     buffer: VertexBuffer<Vertex>,
@@ -33,8 +33,8 @@ impl Object for Glyph {
 }
 
 fn construct<'l>(mut program: Program<'l>) -> Result<Vec<Vertex>> {
-    let mut vertices = Vec::new();
-    while let Some((operator, arguments)) = ok!(program.next()) {
+    let vertices = Vec::new();
+    while let Some((_, _)) = ok!(program.next()) {
     }
     Ok(vertices)
 }

@@ -3,6 +3,7 @@ use glium::{Display, Program};
 use {Object, Result};
 
 pub struct Scene {
+    #[allow(dead_code)]
     program: Program,
     objects: Vec<Box<Object>>,
 }
