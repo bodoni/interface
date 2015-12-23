@@ -13,10 +13,7 @@ macro_rules! ok(($result:expr) => ($result.unwrap()));
 
 fn main() {
     let file = ok!(File::open("tests/fixtures/SourceSerifPro-Regular.otf"));
-    let fontset = match file.postscript_fontset {
-        Some(ref fontset) => fontset,
-        _ => unreachable!(),
-    };
+    let fontset = ok!(file.postscript_fontset);
     let program = Program::new(&fontset.charstrings[0][134], &fontset.global_subroutines,
                                &fontset.local_subroutines[0]);
 
