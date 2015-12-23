@@ -1,5 +1,5 @@
 use glium::index::{NoIndices, PrimitiveType};
-use glium::{Display, VertexBuffer};
+use glium::{Display, Frame, VertexBuffer};
 use postscript::type2::Program;
 
 use {Object, Result};
@@ -27,7 +27,7 @@ impl Glyph {
 }
 
 impl Object for Glyph {
-    fn render(&self) -> Result<()> {
+    fn render(&self, _: &mut Frame) -> Result<()> {
         Ok(())
     }
 }

@@ -1,4 +1,4 @@
-use glium::{Display, Program};
+use glium::{Display, Frame, Program};
 
 use {Object, Result};
 
@@ -22,9 +22,9 @@ impl Scene {
 }
 
 impl Object for Scene {
-    fn render(&self) -> Result<()> {
+    fn render(&self, frame: &mut Frame) -> Result<()> {
         for object in self.objects.iter() {
-            try!(object.render());
+            try!(object.render(frame));
         }
         Ok(())
     }

@@ -25,10 +25,10 @@ fn main() {
     scene.append(ok!(Glyph::new(&display, program)));
 
     'outer: loop {
-        let mut target = display.draw();
-        target.clear_color(0.259, 0.545, 0.792, 1.0);
-        ok!(scene.render());
-        ok!(target.finish());
+        let mut frame = display.draw();
+        frame.clear_color(0.259, 0.545, 0.792, 1.0);
+        ok!(scene.render(&mut frame));
+        ok!(frame.finish());
 
         for event in display.poll_events() {
             match event {

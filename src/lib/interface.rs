@@ -5,6 +5,7 @@ extern crate postscript;
 #[macro_use]
 extern crate glium;
 
+use glium::Frame;
 use std::{error, fmt};
 
 /// An error.
@@ -14,7 +15,7 @@ pub struct Error(String);
 pub type Result<T> = std::result::Result<T, Error>;
 
 pub trait Object {
-    fn render(&self) -> Result<()>;
+    fn render(&self, &mut Frame) -> Result<()>;
 }
 
 macro_rules! ok(
