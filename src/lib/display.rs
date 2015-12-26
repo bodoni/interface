@@ -13,7 +13,6 @@ pub struct Display {
 
 impl Display {
     /// Create a display.
-    #[inline]
     pub fn from(inner: glium::Display) -> Result<Display> {
         let program = ok!(Program::from_source(&inner, VERTEX_SHADER, FRAGMENT_SHADER, None));
         Ok(Display { inner: inner, context: Context::new(program) })

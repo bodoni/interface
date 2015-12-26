@@ -19,7 +19,6 @@ pub struct Content {
 
 impl Context {
     /// Create a context.
-    #[inline]
     pub fn new(program: Program) -> Context {
         Context(Rc::new(Content {
             program: program,
