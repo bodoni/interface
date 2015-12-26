@@ -13,12 +13,14 @@ struct Point {
 
 implement_vertex!(Point, position);
 
+/// A glyph.
 pub struct Glyph {
     vertex_buffer: VertexBuffer<Point>,
     index_buffer: NoIndices,
 }
 
 impl Glyph {
+    /// Create a glyph.
     pub fn new<'l>(display: &Display, program: Program<'l>) -> Result<Glyph> {
         Ok(Glyph {
             vertex_buffer: ok!(VertexBuffer::new(display, &try!(construct(program))),

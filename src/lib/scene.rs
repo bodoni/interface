@@ -15,7 +15,7 @@ impl Scene {
         Ok(Scene { objects: vec![] })
     }
 
-    /// Append an object.
+    /// Append an object to the scene.
     #[inline]
     pub fn append<T: 'static + Object>(&mut self, object: T) {
         self.objects.push(Box::new(object));

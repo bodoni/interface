@@ -6,6 +6,7 @@ pub struct Error(pub String);
 /// A result.
 pub type Result<T> = result::Result<T, Error>;
 
+/// Unwrap a nonnative result or raise an error.
 #[macro_export]
 macro_rules! ok(
     ($result:expr) => (match $result {
@@ -18,6 +19,7 @@ macro_rules! ok(
     });
 );
 
+/// Raise an error.
 #[macro_export]
 macro_rules! raise(
     ($message:expr) => (return Err($crate::Error($message.to_string())));

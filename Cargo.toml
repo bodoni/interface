@@ -22,6 +22,7 @@ features = ["glutin"]
 name = "interface"
 path = "src/bin/interface.rs"
 test = false
+doc = false
 
 [lib]
 name = "interface"
