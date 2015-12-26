@@ -1,37 +1,60 @@
 extern crate glium;
-extern crate interface;
 extern crate opentype;
 extern crate postscript;
 
-use glium::glutin::{Event, WindowBuilder};
-use glium::{DisplayBuild, Surface};
-use interface::{Glyph, Object, Scene};
-use opentype::File;
-use postscript::type2::Program;
+#[macro_use]
+extern crate interface;
 
-macro_rules! ok(($result:expr) => ($result.unwrap()));
+use interface::{Display, Glyph, Object, Result, Scene};
 
 fn main() {
-    let file = ok!(File::open("tests/fixtures/SourceSerifPro-Regular.otf"));
-    let fontset = ok!(file.postscript_fontset);
-    let program = Program::new(&fontset.charstrings[0][134], &fontset.global_subroutines,
-                               &fontset.local_subroutines[0]);
+    start().unwrap();
+}
 
-    let display = ok!(WindowBuilder::new().with_title("Interface".to_string()).build_glium());
-    let mut scene = ok!(Scene::new(&display));
-    scene.append(ok!(Glyph::new(&display, program)));
+fn start() -> Result<()> {
+    use glium::Surface;
+    use glium::glutin::Event;
 
-    'outer: loop {
-        let mut frame = display.draw();
-        frame.clear_color(0.259, 0.545, 0.792, 1.0);
-        ok!(scene.render(&mut frame));
-        ok!(frame.finish());
+    let mut display = try!(create_display());
+    let scene = try!(create_scene(&display));
 
+    loop {
+        try!(display.update(|frame| {
+            frame.clear_color(0.259, 0.545, 0.792, 1.0);
+            scene.render(frame)
+        }));
         for event in display.poll_events() {
             match event {
-                Event::Closed => break 'outer,
+                Event::Closed => return Ok(()),
                 _ => {},
             }
         }
     }
+}
+
+fn create_display() -> Result<Display> {
+    use glium::DisplayBuild;
+    use glium::glutin::WindowBuilder;
+
+    let display = ok!(WindowBuilder::new().with_title("Interface".to_string()).build_glium());
+    Display::from(display)
+}
+
+fn create_scene(display: &Display) -> Result<Scene> {
+    use opentype::File;
+    use postscript::type2::Program;
+
+    let file = ok!(File::open("tests/fixtures/SourceSerifPro-Regular.otf"));
+    let fontset = match file.postscript_fontset {
+        Some(ref fontset) => fontset,
+        _ => raise!("failed to find a font set"),
+    };
+    let program = Program::new(&fontset.charstrings[0][134],
+                               &fontset.global_subroutines,
+                               &fontset.local_subroutines[0]);
+
+    let mut scene = try!(Scene::new(&display));
+    scene.append(try!(Glyph::new(&display, program)));
+
+    Ok(scene)
 }

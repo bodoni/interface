@@ -1,20 +1,21 @@
-use glium::{Display, Frame, Program};
+use Object;
+use display::Display;
+use frame::Frame;
+use outcome::Result;
 
-use {Object, Result};
-
+/// A scene.
 pub struct Scene {
-    #[allow(dead_code)]
-    program: Program,
     objects: Vec<Box<Object>>,
 }
 
 impl Scene {
+    /// Create a scene.
     #[inline]
-    pub fn new(display: &Display) -> Result<Scene> {
-        let program = ok!(Program::from_source(display, VERTEX_SHADER, FRAGMENT_SHADER, None));
-        Ok(Scene { program: program, objects: vec![] })
+    pub fn new(_: &Display) -> Result<Scene> {
+        Ok(Scene { objects: vec![] })
     }
 
+    /// Append an object.
     #[inline]
     pub fn append<T: 'static + Object>(&mut self, object: T) {
         self.objects.push(Box::new(object));
@@ -29,25 +30,3 @@ impl Object for Scene {
         Ok(())
     }
 }
-
-const VERTEX_SHADER: &'static str = r#"
-#version 140
-
-in vec2 position;
-
-void main()
-{
-    gl_Position = vec4(position, 0.0, 1.0);
-}
-"#;
-
-const FRAGMENT_SHADER: &'static str = r#"
-#version 140
-
-out vec4 color;
-
-void main()
-{
-    color = vec4(0.0, 0.0, 0.0, 1.0);
-}
-"#;
