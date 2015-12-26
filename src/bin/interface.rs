@@ -8,7 +8,10 @@ extern crate interface;
 use interface::{Display, Glyph, Object, Result, Scene};
 
 fn main() {
-    start().unwrap();
+    match start() {
+        Err(error) => println!("Error: {}.", error),
+        _ => {},
+    }
 }
 
 fn start() -> Result<()> {
