@@ -1,6 +1,6 @@
 use glium::index::{NoIndices, PrimitiveType};
 use glium::{Display, VertexBuffer};
-use postscript::type2::Program;
+use opentype::postscript::type2::Program;
 
 use Object;
 use frame::Frame;

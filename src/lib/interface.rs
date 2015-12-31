@@ -1,6 +1,5 @@
 extern crate curve;
 extern crate opentype;
-extern crate postscript;
 
 #[macro_use]
 extern crate glium;
