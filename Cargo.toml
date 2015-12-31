@@ -10,7 +10,7 @@ description = "An interface."
 
 [dependencies]
 curve = "0.2"
-opentype = "0.5.1"
+opentype = "0.6"
 
 [dependencies.glium]
 version = "0.13"
