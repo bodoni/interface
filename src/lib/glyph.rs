@@ -1,6 +1,6 @@
 use glium::index::{NoIndices, PrimitiveType};
 use glium::{Display, VertexBuffer};
-use opentype::postscript::type2::Program;
+use postscript::type2::Program;
 
 use Object;
 use frame::Frame;
@@ -37,7 +37,7 @@ impl Object for Glyph {
 }
 
 fn construct<'l>(mut program: Program<'l>) -> Result<Vec<Point>> {
-    use opentype::postscript::type2::Operator::*;
+    use postscript::type2::Operator::*;
 
     let vertices = Vec::new();
     while let Some((operator, operands)) = ok!(program.next()) {

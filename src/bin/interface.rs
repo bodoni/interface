@@ -1,5 +1,6 @@
 extern crate glium;
 extern crate opentype;
+extern crate postscript;
 
 #[macro_use]
 extern crate interface;
@@ -44,7 +45,7 @@ fn create_display() -> Result<Display> {
 
 fn create_scene(display: &Display) -> Result<Scene> {
     use opentype::File;
-    use opentype::postscript::type2::Program;
+    use postscript::type2::Program;
 
     let file = ok!(File::open("tests/fixtures/SourceSerifPro-Regular.otf"));
     let fontset = match file.postscript_fontset {

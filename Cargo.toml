@@ -8,15 +8,6 @@ homepage = "https://github.com/bodoni/interface"
 documentation = "https://bodoni.github.io/interface"
 description = "An interface."
 
-[dependencies]
-curve = "0.2"
-opentype = "0.7"
-
-[dependencies.glium]
-version = "0.13"
-default-features = false
-features = ["glutin"]
-
 [[bin]]
 name = "interface"
 path = "src/bin/interface.rs"
@@ -26,3 +17,13 @@ doc = false
 [lib]
 name = "interface"
 path = "src/lib/interface.rs"
+
+[dependencies]
+curve = "0.2"
+opentype = "0.8"
+postscript = "0.3"
+
+[dependencies.glium]
+version = "0.13"
+default-features = false
+features = ["glutin"]
