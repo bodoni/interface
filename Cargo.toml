@@ -24,6 +24,6 @@ opentype = "0.8"
 postscript = "0.3"
 
 [dependencies.glium]
-version = "0.13"
+version = "0.14"
 default-features = false
 features = ["glutin"]
