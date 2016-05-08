@@ -25,7 +25,7 @@ impl Display {
         let mut frame = Frame::from(self.inner.draw(), self.context.clone());
         let result = closure(&mut frame);
         let frame = glium::Frame::from(frame);
-        frame.finish().unwrap(); // FIXME: Use ok! when glium > 0.13.2.
+        ok!(frame.finish());
         result
     }
 }
