@@ -39,7 +39,10 @@ fn create_display() -> Result<Display> {
     use glium::DisplayBuild;
     use glium::glutin::WindowBuilder;
 
-    let display = ok!(WindowBuilder::new().with_title("Interface".to_string()).build_glium());
+    let display = ok!(WindowBuilder::new()
+                                    .with_dimensions(600, 600)
+                                    .with_title("Interface".to_string())
+                                    .build_glium());
     Display::from(display)
 }
 
