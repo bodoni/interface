@@ -51,8 +51,7 @@ const VERTEX_SHADER: &'static str = r#"
 
 in vec2 position;
 
-void main()
-{
+void main() {
     gl_Position = vec4(position, 0.0, 1.0);
 }
 "#;
@@ -62,8 +61,7 @@ const FRAGMENT_SHADER: &'static str = r#"
 
 out vec4 color;
 
-void main()
-{
+void main() {
     color = vec4(0.0, 0.0, 0.0, 1.0);
 }
 "#;
