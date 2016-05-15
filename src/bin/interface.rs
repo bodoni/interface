@@ -1,6 +1,5 @@
+extern crate font;
 extern crate glium;
-extern crate opentype;
-extern crate postscript;
 
 #[macro_use]
 extern crate interface;
@@ -47,20 +46,20 @@ fn create_display() -> Result<Display> {
 }
 
 fn create_scene(display: &Display) -> Result<Scene> {
-    use opentype::File;
-    use postscript::type2::Program;
+    use font::File;
 
     let file = ok!(File::open("tests/fixtures/SourceSerifPro-Regular.otf"));
-    let fontset = match file.postscript_fontset {
-        Some(ref fontset) => fontset,
-        _ => raise!("failed to find a font set"),
+    let font = match file.fonts.get(0) {
+        Some(font) => font,
+        _ => raise!("failed to find a font"),
     };
-    let program = Program::new(&fontset.charstrings[0][134],
-                               &fontset.global_subroutines,
-                               &fontset.local_subroutines[0]);
+    let glyph = match ok!(font.case.draw('&')) {
+        Some(glyph) => glyph,
+        _ => raise!("failed to draw a glyph"),
+    };
 
     let mut scene = try!(Scene::new(&display));
-    scene.append(try!(Glyph::new(&display, program)));
+    scene.append(try!(Glyph::new(&display, glyph)));
 
     Ok(scene)
 }

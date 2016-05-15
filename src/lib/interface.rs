@@ -1,6 +1,4 @@
-extern crate curve;
-extern crate opentype;
-extern crate postscript;
+extern crate font;
 
 #[macro_use]
 extern crate glium;

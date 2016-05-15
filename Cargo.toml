@@ -19,9 +19,7 @@ name = "interface"
 path = "src/lib/interface.rs"
 
 [dependencies]
-curve = "0.2"
-opentype = "0.8"
-postscript = "0.3"
+font = "0.0.2"
 
 [dependencies.glium]
 version = "0.14"
