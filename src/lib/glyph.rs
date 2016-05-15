@@ -45,7 +45,7 @@ fn construct(glyph: font::Glyph) -> Result<Vec<Point>> {
     let mut first = true;
     for operation in glyph.iter() {
         match operation {
-            &BezierTo(a, b, c) => {
+            &CurveTo(a, b, c) => {
                 cursor = c;
                 first = false;
             },
