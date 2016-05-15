@@ -43,7 +43,7 @@ fn construct(glyph: font::Glyph) -> Result<Vec<Point>> {
     let mut vertices = Vec::new();
     let mut cursor = (0f32, 0f32);
     let mut first = true;
-    for operation in &glyph.program {
+    for operation in glyph.iter() {
         match operation {
             &BezierTo(a, b, c) => {
                 cursor = c;

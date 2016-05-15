@@ -53,7 +53,7 @@ fn create_scene(display: &Display) -> Result<Scene> {
         Some(font) => font,
         _ => raise!("failed to find a font"),
     };
-    let glyph = match ok!(font.case.draw('&')) {
+    let glyph = match ok!(font.draw('&')) {
         Some(glyph) => glyph,
         _ => raise!("failed to draw a glyph"),
     };
