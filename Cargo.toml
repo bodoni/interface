@@ -1,12 +1,12 @@
 [package]
 name = "interface"
-version = "0.0.1"
+version = "0.0.2"
+license = "Apache-2.0/MIT"
 authors = ["Ivan Ukhov <ivan.ukhov@gmail.com>"]
-license = "MIT"
-repository = "https://github.com/bodoni/interface"
-homepage = "https://github.com/bodoni/interface"
+description = "The package provides an interface."
 documentation = "https://bodoni.github.io/interface"
-description = "An interface."
+homepage = "https://github.com/bodoni/interface"
+repository = "https://github.com/bodoni/interface"
 
 [[bin]]
 name = "interface"
@@ -19,7 +19,7 @@ name = "interface"
 path = "src/lib/interface.rs"
 
 [dependencies]
-font = "0.0.6"
+font = "0.0"
 
 [dependencies.glium]
 version = "0.14"
