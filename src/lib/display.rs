@@ -5,8 +5,8 @@ use context::Context;
 use frame::Frame;
 use outcome::Result;
 
-const VERTEX_SHADER: &'static str = include_str!("vertex.glsl");
-const FRAGMENT_SHADER: &'static str = include_str!("fragment.glsl");
+const VERTEX_SHADER: &'static str = include_str!("shaders/vertex.glsl");
+const FRAGMENT_SHADER: &'static str = include_str!("shaders/fragment.glsl");
 
 /// A display.
 pub struct Display {
