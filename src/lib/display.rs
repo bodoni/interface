@@ -5,6 +5,9 @@ use context::Context;
 use frame::Frame;
 use outcome::Result;
 
+const VERTEX_SHADER: &'static str = include_str!("vertex.glsl");
+const FRAGMENT_SHADER: &'static str = include_str!("fragment.glsl");
+
 /// A display.
 pub struct Display {
     inner: glium::Display,
@@ -45,23 +48,3 @@ impl DerefMut for Display {
         &mut self.inner
     }
 }
-
-const VERTEX_SHADER: &'static str = r#"
-#version 140
-
-in vec2 position;
-
-void main() {
-    gl_Position = vec4(position, 0.0, 1.0);
-}
-"#;
-
-const FRAGMENT_SHADER: &'static str = r#"
-#version 140
-
-out vec4 color;
-
-void main() {
-    color = vec4(0.0, 0.0, 0.0, 1.0);
-}
-"#;
