@@ -49,7 +49,7 @@ fn create_scene(display: &Display) -> Result<Scene> {
     use font::File;
 
     let file = ok!(File::open("tests/fixtures/SourceSerifPro-Regular.otf"));
-    let font = match file.fonts.get(0) {
+    let font = match file.get(0) {
         Some(font) => font,
         _ => raise!("failed to find a font"),
     };
