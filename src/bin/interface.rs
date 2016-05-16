@@ -38,11 +38,10 @@ fn create_display() -> Result<Display> {
     use glium::DisplayBuild;
     use glium::glutin::WindowBuilder;
 
-    let display = ok!(WindowBuilder::new()
+    Display::from(ok!(WindowBuilder::new()
                                     .with_dimensions(600, 600)
                                     .with_title("Interface".to_string())
-                                    .build_glium());
-    Display::from(display)
+                                    .build_glium()))
 }
 
 fn create_scene(display: &Display) -> Result<Scene> {
