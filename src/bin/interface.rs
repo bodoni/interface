@@ -19,7 +19,6 @@ fn start() -> Result<()> {
 
     let mut display = try!(create_display());
     let scene = try!(create_scene(&display));
-
     loop {
         try!(display.update(|frame| {
             frame.clear_color(0.259, 0.545, 0.792, 1.0);
@@ -56,9 +55,7 @@ fn create_scene(display: &Display) -> Result<Scene> {
         Some(glyph) => glyph,
         _ => raise!("failed to draw a glyph"),
     };
-
     let mut scene = try!(Scene::new(&display));
     scene.append(try!(Glyph::new(&display, glyph)));
-
     Ok(scene)
 }
