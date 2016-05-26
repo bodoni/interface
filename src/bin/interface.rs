@@ -39,7 +39,7 @@ fn create_display() -> Result<Display> {
 
     Display::from(ok!(WindowBuilder::new()
                                     .with_dimensions(600, 600)
-                                    .with_title("Interface".to_string())
+                                    .with_title("Interface")
                                     .build_glium()))
 }
 
