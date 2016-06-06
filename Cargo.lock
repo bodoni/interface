@@ -225,7 +225,7 @@ dependencies = [
  "wayland-kbd 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "wayland-window 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "x11-dl 2.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "x11-dl 2.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -460,7 +460,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "x11-dl"
-version = "2.5.1"
+version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "lazy_static 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
