@@ -38,6 +38,7 @@ impl Object for Glyph {
 
 #[allow(unused_assignments, unused_mut, unused_variables)]
 fn construct(glyph: font::Glyph) -> Result<Vec<Point>> {
+    use font::Curve::*;
     use font::Operation::*;
 
     let mut vertices = Vec::new();
@@ -45,17 +46,21 @@ fn construct(glyph: font::Glyph) -> Result<Vec<Point>> {
     let mut first = true;
     for operation in glyph.iter() {
         match operation {
-            &CurveTo(a, b, c) => {
-                cursor = c;
-                first = false;
-            },
-            &LineTo(a) => {
-                cursor = a;
-                first = false;
-            },
-            &MoveTo(a) => {
+            &Move(a) => {
                 cursor = a;
                 first = true;
+            },
+            &Line(a) => {
+                cursor = a;
+                first = false;
+            },
+            &Curve(Quadratic(a, b)) => {
+                cursor = b;
+                first = false;
+            },
+            &Curve(Cubic(a, b, c)) => {
+                cursor = c;
+                first = false;
             },
         }
     }
