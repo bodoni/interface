@@ -38,30 +38,32 @@ impl Object for Glyph {
 
 #[allow(unused_assignments, unused_mut, unused_variables)]
 fn construct(glyph: font::Glyph) -> Result<Vec<Point>> {
-    use font::Curve::*;
-    use font::Operation::*;
+    use font::Segment::*;
 
     let mut vertices = Vec::new();
     let mut cursor = (0f32, 0f32);
-    let mut first = true;
-    for operation in glyph.iter() {
-        match operation {
-            &Move(a) => {
-                cursor = a;
-                first = true;
-            },
-            &Line(a) => {
-                cursor = a;
-                first = false;
-            },
-            &Curve(Quadratic(a, b)) => {
-                cursor = b;
-                first = false;
-            },
-            &Curve(Cubic(a, b, c)) => {
-                cursor = c;
-                first = false;
-            },
+    macro_rules! offset(
+        ($point:ident) => ({
+            cursor.0 += $point.0;
+            cursor.1 += $point.1;
+        });
+    );
+    for contour in glyph.iter() {
+        for segmet in contour.iter() {
+            match segmet {
+                &Linear(a) => {
+                    offset!(a);
+                },
+                &Quadratic(a, b) => {
+                    offset!(a);
+                    offset!(b);
+                },
+                &Cubic(a, b, c) => {
+                    offset!(a);
+                    offset!(b);
+                    offset!(c);
+                },
+            }
         }
     }
     Ok(vertices)
