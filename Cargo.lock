@@ -2,6 +2,7 @@
 name = "interface"
 version = "0.0.2"
 dependencies = [
+ "curve 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "font 0.0.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "glium 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -105,6 +106,14 @@ dependencies = [
 name = "crossbeam"
 version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "curve"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "num-traits 0.1.33 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "dbghelp-sys"

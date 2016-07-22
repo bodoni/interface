@@ -19,10 +19,17 @@ pub struct Glyph {
     index_buffer: NoIndices,
 }
 
+impl From<(f32, f32)> for Point {
+    #[inline]
+    fn from((x, y): (f32, f32)) -> Self {
+        Point { position: [x, y] }
+    }
+}
+
 impl From<font::Offset> for Point {
     #[inline]
-    fn from(offset: font::Offset) -> Self {
-        Point { position: [offset.0, offset.1] }
+    fn from(font::Offset(x, y): font::Offset) -> Self {
+        Point { position: [x, y] }
     }
 }
 
@@ -46,30 +53,48 @@ impl Object for Glyph {
 }
 
 fn construct(glyph: font::Glyph) -> Result<Vec<Point>> {
+    use curve::bezier;
     use font::Segment::*;
 
+    const POINTS: usize = 10;
     let mut vertices = Vec::new();
-    let mut cursor = font::Offset::from(0.0);
-    macro_rules! push(() => (vertices.push(cursor.into())));
+    let mut a = font::Offset::from(0.0);
     for contour in glyph.iter() {
-        cursor += contour.offset;
-        push!();
+        a += contour.offset;
+        vertices.push(a.into());
         for segmet in contour.iter() {
             match segmet {
-                &Linear(a) => {
-                    cursor += a;
+                &Linear(b) => {
+                    let b_ = a + b;
+                    let x = bezier::Linear::new(a.0, b_.0);
+                    let y = bezier::Linear::new(a.1, b_.1);
+                    for (x, y) in x.trace(POINTS).zip(y.trace(POINTS)).skip(1) {
+                        vertices.push((x, y).into());
+                    }
+                    a = b_;
                 },
-                &Quadratic(a, b) => {
-                    cursor += a;
-                    cursor += b;
+                &Quadratic(b, c) => {
+                    let b_ = a + b;
+                    let c_ = b_ + c;
+                    let x = bezier::Quadratic::new(a.0, b_.0, c_.0);
+                    let y = bezier::Quadratic::new(a.1, b_.1, c_.1);
+                    for (x, y) in x.trace(POINTS).zip(y.trace(POINTS)).skip(1) {
+                        vertices.push((x, y).into());
+                    }
+                    a = c_;
                 },
-                &Cubic(a, b, c) => {
-                    cursor += a;
-                    cursor += b;
-                    cursor += c;
+                &Cubic(b, c, d) => {
+                    let b_ = a + b;
+                    let c_ = b_ + c;
+                    let d_ = c_ + d;
+                    let x = bezier::Cubic::new(a.0, b_.0, c_.0, d_.0);
+                    let y = bezier::Cubic::new(a.1, b_.1, c_.1, d_.1);
+                    for (x, y) in x.trace(POINTS).zip(y.trace(POINTS)).skip(1) {
+                        vertices.push((x, y).into());
+                    }
+                    a = d_;
                 },
             }
-            push!();
         }
     }
     Ok(vertices)

@@ -1,3 +1,4 @@
+extern crate curve;
 extern crate font;
 
 #[macro_use]
