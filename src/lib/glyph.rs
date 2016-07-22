@@ -65,34 +65,34 @@ fn construct(glyph: font::Glyph) -> Result<Vec<Point>> {
         for segmet in contour.iter() {
             match segmet {
                 &Linear(b) => {
-                    let b_ = a + b;
-                    let x = bezier::Linear::new(a.0, b_.0);
-                    let y = bezier::Linear::new(a.1, b_.1);
+                    let b = a + b;
+                    let x = bezier::Linear::new(a.0, b.0);
+                    let y = bezier::Linear::new(a.1, b.1);
                     for (x, y) in x.trace(POINTS).zip(y.trace(POINTS)).skip(1) {
                         vertices.push((x, y).into());
                     }
-                    a = b_;
+                    a = b;
                 },
                 &Quadratic(b, c) => {
-                    let b_ = a + b;
-                    let c_ = b_ + c;
-                    let x = bezier::Quadratic::new(a.0, b_.0, c_.0);
-                    let y = bezier::Quadratic::new(a.1, b_.1, c_.1);
+                    let b = a + b;
+                    let c = b + c;
+                    let x = bezier::Quadratic::new(a.0, b.0, c.0);
+                    let y = bezier::Quadratic::new(a.1, b.1, c.1);
                     for (x, y) in x.trace(POINTS).zip(y.trace(POINTS)).skip(1) {
                         vertices.push((x, y).into());
                     }
-                    a = c_;
+                    a = c;
                 },
                 &Cubic(b, c, d) => {
-                    let b_ = a + b;
-                    let c_ = b_ + c;
-                    let d_ = c_ + d;
-                    let x = bezier::Cubic::new(a.0, b_.0, c_.0, d_.0);
-                    let y = bezier::Cubic::new(a.1, b_.1, c_.1, d_.1);
+                    let b = a + b;
+                    let c = b + c;
+                    let d = c + d;
+                    let x = bezier::Cubic::new(a.0, b.0, c.0, d.0);
+                    let y = bezier::Cubic::new(a.1, b.1, c.1, d.1);
                     for (x, y) in x.trace(POINTS).zip(y.trace(POINTS)).skip(1) {
                         vertices.push((x, y).into());
                     }
-                    a = d_;
+                    a = d;
                 },
             }
         }
