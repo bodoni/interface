@@ -2,7 +2,7 @@
 name = "interface"
 version = "0.0.2"
 dependencies = [
- "font 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
+ "font 0.0.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "glium 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -139,12 +139,12 @@ dependencies = [
 
 [[package]]
 name = "font"
-version = "0.0.10"
+version = "0.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "opentype 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "opentype 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "postscript 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "truetype 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "truetype 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -312,11 +312,11 @@ dependencies = [
 
 [[package]]
 name = "opentype"
-version = "0.11.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "postscript 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "truetype 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "truetype 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -413,7 +413,7 @@ dependencies = [
 
 [[package]]
 name = "truetype"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
