@@ -19,13 +19,22 @@ pub struct Glyph {
     index_buffer: NoIndices,
 }
 
+impl From<font::Offset> for Point {
+    #[inline]
+    fn from(offset: font::Offset) -> Self {
+        Point { position: [offset.0, offset.1] }
+    }
+}
+
 impl Glyph {
     /// Create a glyph.
     pub fn new<'l>(display: &Display, glyph: font::Glyph) -> Result<Glyph> {
+        let mut vertices = try!(construct(glyph));
+        scale(&mut vertices, 0.95);
         Ok(Glyph {
-            vertex_buffer: ok!(VertexBuffer::new(display, &try!(construct(glyph))),
+            vertex_buffer: ok!(VertexBuffer::new(display, &vertices),
                                "failed to create a vertex buffer"),
-            index_buffer: NoIndices(PrimitiveType::TriangleStrip),
+            index_buffer: NoIndices(PrimitiveType::LineStrip),
         })
     }
 }
@@ -36,35 +45,48 @@ impl Object for Glyph {
     }
 }
 
-#[allow(unused_assignments, unused_mut, unused_variables)]
 fn construct(glyph: font::Glyph) -> Result<Vec<Point>> {
     use font::Segment::*;
 
     let mut vertices = Vec::new();
-    let mut cursor = (0f32, 0f32);
-    macro_rules! offset(
-        ($point:ident) => ({
-            cursor.0 += $point.0;
-            cursor.1 += $point.1;
-        });
-    );
+    let mut cursor = font::Offset::from(0.0);
+    macro_rules! push(() => (vertices.push(cursor.into())));
     for contour in glyph.iter() {
+        cursor += contour.offset;
+        push!();
         for segmet in contour.iter() {
             match segmet {
                 &Linear(a) => {
-                    offset!(a);
+                    cursor += a;
                 },
                 &Quadratic(a, b) => {
-                    offset!(a);
-                    offset!(b);
+                    cursor += a;
+                    cursor += b;
                 },
                 &Cubic(a, b, c) => {
-                    offset!(a);
-                    offset!(b);
-                    offset!(c);
+                    cursor += a;
+                    cursor += b;
+                    cursor += c;
                 },
             }
+            push!();
         }
     }
     Ok(vertices)
+}
+
+fn scale(vertices: &mut [Point], fraction: f32) {
+    use std::f32::INFINITY;
+
+    let (mut min_x, mut max_x, mut min_y, mut max_y) = (INFINITY, -INFINITY, INFINITY, -INFINITY);
+    for &Point { position } in vertices.iter() {
+        min_x = min_x.min(position[0]);
+        max_x = max_x.max(position[0]);
+        min_y = min_y.min(position[1]);
+        max_y = max_y.max(position[1]);
+    }
+    for &mut Point { ref mut position } in vertices.iter_mut() {
+        position[0] = 2.0 * fraction * (position[0] - min_x) / (max_x - min_x) - fraction;
+        position[1] = 2.0 * fraction * (position[1] - min_y) / (max_y - min_y) - fraction;
+    }
 }
