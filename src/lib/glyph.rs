@@ -36,8 +36,8 @@ impl From<font::Offset> for Point {
 impl Glyph {
     /// Create a glyph.
     pub fn new<'l>(display: &Display, glyph: font::Glyph) -> Result<Glyph> {
-        let mut vertices = try!(construct(glyph));
-        scale(&mut vertices, 0.95);
+        let mut vertices = try!(construct(&glyph));
+        scale(&glyph, &mut vertices, 0.95);
         Ok(Glyph {
             vertex_buffer: ok!(VertexBuffer::new(display, &vertices),
                                "failed to create a vertex buffer"),
@@ -52,7 +52,7 @@ impl Object for Glyph {
     }
 }
 
-fn construct(glyph: font::Glyph) -> Result<Vec<Point>> {
+fn construct(glyph: &font::Glyph) -> Result<Vec<Point>> {
     use curve::bezier;
     use font::Segment::*;
 
@@ -100,16 +100,8 @@ fn construct(glyph: font::Glyph) -> Result<Vec<Point>> {
     Ok(vertices)
 }
 
-fn scale(vertices: &mut [Point], fraction: f32) {
-    use std::f32::INFINITY;
-
-    let (mut min_x, mut max_x, mut min_y, mut max_y) = (INFINITY, -INFINITY, INFINITY, -INFINITY);
-    for &Point { position } in vertices.iter() {
-        min_x = min_x.min(position[0]);
-        max_x = max_x.max(position[0]);
-        min_y = min_y.min(position[1]);
-        max_y = max_y.max(position[1]);
-    }
+fn scale(glyph: &font::Glyph, vertices: &mut [Point], fraction: f32) {
+    let (min_x, min_y, max_x, max_y) = glyph.bounding_box;
     for &mut Point { ref mut position } in vertices.iter_mut() {
         position[0] = 2.0 * fraction * (position[0] - min_x) / (max_x - min_x) - fraction;
         position[1] = 2.0 * fraction * (position[1] - min_y) / (max_y - min_y) - fraction;
